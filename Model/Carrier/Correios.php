@@ -10,8 +10,7 @@ use Magento\Shipping\Model\Carrier\CarrierInterface;
 /**
  * Correios shipping model
  */
-class Correios extends AbstractCarrier implements CarrierInterface
-{
+class Correios extends AbstractCarrier implements CarrierInterface {
   /**
    * @var string
    */
@@ -60,8 +59,7 @@ class Correios extends AbstractCarrier implements CarrierInterface
    * @param RateRequest $request
    * @return \Magento\Shipping\Model\Rate\Result|bool
    */
-  public function collectRates(RateRequest $request)
-  {
+  public function collectRates(RateRequest $request) {
     if (!$this->getConfigFlag('active')) {
       return false;
     }
@@ -114,11 +112,14 @@ class Correios extends AbstractCarrier implements CarrierInterface
     return $result;
   }
 
+  public function isTrackingAvailable() {
+    return true;
+  }
+
   /**
    * @return array
    */
-  public function getAllowedMethods()
-  {
+  public function getAllowedMethods() {
     return [$this->_code => $this->getConfigData('name')];
   }
 }

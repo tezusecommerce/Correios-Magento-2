@@ -50,7 +50,7 @@ class AddAlturaCorreiosProductAttribute implements DataPatchInterface, PatchReve
     $eavSetup->addAttribute(
       \Magento\Catalog\Model\Product::ENTITY,
       'altura_correios',
-      [ 
+      [
         'group' => 'Correios',
         'type' => 'varchar',
         'label' => 'Altura Correios',

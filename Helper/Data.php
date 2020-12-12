@@ -8,8 +8,7 @@ use Zend\Log\Writer\Stream;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\State;
 
-class Data extends AbstractHelper
-{
+class Data extends AbstractHelper {
   /**
    * @var \Magento\Framework\App\Config\ScopeConfigInterface
    */
@@ -46,8 +45,7 @@ class Data extends AbstractHelper
    * returning config value
    **/
 
-  public function getConfig($path)
-  {
+  public function getConfig($path) {
     $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
     return $this->scopeConfig->getValue($path, $storeScope);
   }
@@ -55,8 +53,7 @@ class Data extends AbstractHelper
   /**
    * @param $message
    */
-  public function logMessage($message)
-  {
+  public function logMessage($message) {
     $this->logger->info($message);
   }
 
@@ -65,8 +62,7 @@ class Data extends AbstractHelper
    * @param $zipcode
    */
 
-  public function formatZip($zipcode)
-  {
+  public function formatZip($zipcode) {
     $new = trim($zipcode);
     $new = preg_replace('/[^0-9\s]/', '', $new);
     if (!preg_match("/^[0-9]{7,8}$/", $new)) {
@@ -77,8 +73,7 @@ class Data extends AbstractHelper
     return $new;
   }
 
-  public function validateProduct($_product)
-  {
+  public function validateProduct($_product) {
     $rightHeight = [1, 100];
     $rightWidth = [10, 100];
     $rightLength = [15, 100];
@@ -87,7 +82,7 @@ class Data extends AbstractHelper
     $width = $_product->getData()['largura_correios'];
     $length = $_product->getData()['comprimento_correios'];
 
-    if(!$length || !$width || !$height){
+    if (!$length || !$width || !$height) {
       throw new \Exception("Dimensões de um ou mais produtos não preenchidas!", 1);
     }
 

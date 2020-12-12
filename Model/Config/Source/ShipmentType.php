@@ -7,8 +7,8 @@
 
 namespace Tezus\Correios\Model\Config\Source;
 
-class ShipmentType
-{
+class ShipmentType {
+
   const SEDEXSC = 40010;
   const SEDEXCC = 40096;
   const ESEDEXCC = 84019;
@@ -18,8 +18,7 @@ class ShipmentType
   const SEDEXHJ = 40290;
   const SEDEXAC = 40045;
 
-  public function toOptionArray()
-  {
+  public function toOptionArray() {
     return array(
       array('value' => self::SEDEXSC, 'label' => 'SEDEX sem contrato'),
       array('value' => self::SEDEXCC, 'label' => 'SEDEX com contrato'),
@@ -31,4 +30,5 @@ class ShipmentType
       array('value' => self::SEDEXAC, 'label' => 'SEDEX a cobrar'),
     );
   }
+  
 }
