@@ -27,7 +27,6 @@
         </field>
         <field id="own_hands" translate="label" type="select" sortOrder="70" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Own Hands</label>
-          <comment/>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
         <field id="acknowledgment_of_receipt" translate="label" type="select" sortOrder="80" showInDefault="1" showInStore="1" showInWebsite="1">
