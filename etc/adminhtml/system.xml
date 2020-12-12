@@ -14,26 +14,63 @@
         <field id="name" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Method Name</label>
         </field>
-        <field id="shipping_cost" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Shipping Cost</label>
-          <validate>validate-number validate-zero-or-greater</validate>
+        <field id="shipment_type" translate="label" type="multiselect" sortOrder="40" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Shipment Type</label>
+          <source_model>Tezus\Correios\Model\Config\Source\ShipmentType</source_model>
         </field>
-        <field id="sallowspecific" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
-          <label>Ship to Applicable Countries</label>
-          <frontend_class>shipping-applicable-country</frontend_class>
-          <source_model>Magento\Shipping\Model\Config\Source\Allspecificcountries</source_model>
+        <field id="contract_number" translate="label" type="text" sortOrder="50" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Contract Number</label>
         </field>
-        <field id="specificcountry" translate="label" type="multiselect" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
-          <label>Ship to Specific Countries</label>
-          <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
-          <can_be_empty>1</can_be_empty>
+        <field id="contrac_password" translate="label" type="obscure" sortOrder="60" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Contract Password</label>
+          <comment/>
         </field>
-        <field id="showmethod" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+        <field id="own_hands" translate="label" type="select" sortOrder="70" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Own Hands</label>
+          <comment/>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="acknowledgment_of_receipt" translate="label" type="select" sortOrder="80" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Acknowledgment of Receipt</label>
+          <comment/>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="validate_dimensions" translate="label" type="select" sortOrder="90" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Validate Dimensions</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="use_declare_values" translate="label" type="select" sortOrder="100" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Use Declare Values</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="default_width" translate="label" type="text" sortOrder="110" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Default Width</label>
+        </field>
+        <field id="default_height" translate="label" type="text" sortOrder="120" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Default Height</label>
+        </field>
+        <field id="default_length" translate="label" type="text" sortOrder="130" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Default Length</label>
+        </field>
+        <field id="handling_fee" translate="label" type="text" sortOrder="140" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Handling Fee</label>
+        </field>
+        <field id="display_delivery_time" translate="label" type="select" sortOrder="150" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Display Delivery Time?</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        </field>
+        <field id="increment_days_in_delivery_time" translate="label" type="text" sortOrder="160" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Increment days in delivery time</label>
+        </field>
+        <field id="maximum_weight" translate="label" type="text" sortOrder="170" showInDefault="1" showInStore="1" showInWebsite="1">
+          <label>Maximum Weight</label>
+        </field>
+        <field id="showmethod" translate="label" type="select" sortOrder="180" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Show Method if Not Applicable</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
           <frontend_class>shipping-skip-hide</frontend_class>
         </field>
-        <field id="sort_order" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
+        <field id="sort_order" translate="label" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Sort Order</label>
         </field>
       </group>

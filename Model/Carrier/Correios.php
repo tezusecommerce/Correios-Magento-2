@@ -77,7 +77,7 @@ class Correios extends AbstractCarrier implements CarrierInterface
     $method->setMethod($this->_code);
     $method->setMethodTitle($this->getConfigData('name'));
 
-    $shippingCost = (float)$this->getConfigData('shipping_cost');
+    $shippingCost = (float)500;
 
     $method->setPrice($shippingCost);
     $method->setCost($shippingCost);
