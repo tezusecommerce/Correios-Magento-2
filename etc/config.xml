@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+  <default>
+    <carriers>
+      <correios>
+        <active>0</active>
+        <title>Correios</title>
+        <name>Correios</name>
+        <shipping_cost>10</shipping_cost>
+        <sallowspecific>0</sallowspecific>
+        <sort_order>15</sort_order>
+        <model>Tezus\Correios\Model\Carrier\Correios</model>
+      </correios>
+    </carriers>
+  </default>
+</config>
