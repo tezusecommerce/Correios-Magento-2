@@ -2,6 +2,7 @@
 
 namespace Tezus\Correios\Model\Carrier;
 
+use Exception;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Magento\Shipping\Model\Carrier\AbstractCarrier;
 use Magento\Shipping\Model\Carrier\CarrierInterface;
@@ -65,25 +66,51 @@ class Correios extends AbstractCarrier implements CarrierInterface
       return false;
     }
 
-    /** @var \Magento\Shipping\Model\Rate\Result $result */
-    $result = $this->rateResultFactory->create();
+    try {
 
-    /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
-    $method = $this->rateMethodFactory->create();
+      if ($request->getAllItems()) {
+        $data['cubic'] = 0;
+        //$attributes = $this->helperData->getAttributes();
+        foreach ($request->getAllItems() as $key => $item) {
+          $product = $this->productRepository->getById($item->getProductId());
+          if ($this->helperData->validateProduct($product)) {
+            $data['cubic'] +=  $product->getData()['altura_correios'] * $product->getData()['largura_correios'] * $product->getData()['comprimento_correios'] * 300 / 1000000 * $item->getQty();
+          }
+        }
+      }
 
-    $method->setCarrier($this->_code);
-    $method->setCarrierTitle($this->getConfigData('title'));
+      $data['packageWeight'] = $request->getPackageWeight();
+      $data['postDest'] = $request->getDestPostcode();
+      $data['postOrigin'] = $request->getOrigPostcode();
+      $data['packageValue'] = $request->getBaseCurrency()->convert(
+        $request->getPackageValue(),
+        $request->getPackageCurrency()
+      );
 
-    $method->setMethod($this->_code);
-    $method->setMethodTitle($this->getConfigData('name'));
+      /** @var \Magento\Shipping\Model\Rate\Result $result */
+      $result = $this->rateResultFactory->create();
 
-    $shippingCost = (float)500;
+      /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
+      $method = $this->rateMethodFactory->create();
 
-    $method->setPrice($shippingCost);
-    $method->setCost($shippingCost);
+      $method->setCarrier($this->_code);
+      $method->setCarrierTitle($this->getConfigData('title'));
 
-    $result->append($method);
+      $method->setMethod($this->_code);
+      $method->setMethodTitle($this->getConfigData('name'));
 
+      $shippingCost = (float)500;
+
+      $method->setPrice($shippingCost);
+      $method->setCost($shippingCost);
+
+      $result->append($method);
+    } catch (\Exception $e) {
+      $result = $this->_rateErrorFactory->create();
+      $result->setCarrier($this->_code)
+        ->setCarrierTitle($this->getConfigData('name') . " - " . $this->getConfigData('title'))
+        ->setErrorMessage(__($e->getMessage()));
+    }
     return $result;
   }
 

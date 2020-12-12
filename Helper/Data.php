@@ -76,4 +76,33 @@ class Data extends AbstractHelper
     }
     return $new;
   }
+
+  public function validateProduct($_product)
+  {
+    $rightHeight = [1, 100];
+    $rightWidth = [10, 100];
+    $rightLength = [15, 100];
+
+    $height = $_product->getData()['altura_correios'];
+    $width = $_product->getData()['largura_correios'];
+    $length = $_product->getData()['comprimento_correios'];
+
+    if(!$length || !$width || !$height){
+      throw new \Exception("Dimensões de um ou mais produtos não preenchidas!", 1);
+    }
+
+    if ($this->getConfig('carriers/correios/validate_dimensions')) {
+      if ($height < $rightHeight[0] || $height > $rightHeight[1]) {
+        throw new \Exception("Altura de um ou mais produtos está fora do permitido.", 1);
+      }
+      if ($width < $rightWidth[0] || $width > $rightWidth[1]) {
+        throw new \Exception("Largura de um ou mais produtos está fora do permitido.", 1);
+      }
+      if ($length < $rightLength[0] || $length > $rightLength[1]) {
+        throw new \Exception("Comprimento de um ou mais produtos está fora do permitido.", 1);
+      }
+    }
+
+    return true;
+  }
 }
