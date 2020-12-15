@@ -69,6 +69,9 @@ class Correios extends AbstractCarrier implements CarrierInterface {
     }
 
     try {
+      /** @var \Magento\Shipping\Model\Rate\Result $result */
+      $result = $this->rateResultFactory->create();
+
       $methods = explode(",", $this->getConfigData('shipment_type'));
       foreach ($methods as $keys => $send) {
         if ($request->getAllItems()) {
@@ -94,8 +97,13 @@ class Correios extends AbstractCarrier implements CarrierInterface {
           }
           $raiz_cubica = round(pow($total_cm_cubico, 1 / 3), 2);
         }
-        $data[$keys]['nCdEmpresa'] = $this->getConfigFlag('contract_number');
-        $data[$keys]['sDsSenha'] = $this->getConfigFlag('contrac_password');
+        if ($this->getConfigFlag('contract_number')) {
+          $data[$keys]['nCdEmpresa'] = $this->getConfigFlag('contract_number');
+        }
+        if ($this->getConfigFlag('contrac_password')) {
+          $data[$keys]['sDsSenha'] = $this->getConfigFlag('contrac_password');
+        }
+
         $data[$keys]['nCdServico'] = $send;
         $data[$keys]['nVlPeso'] = $total_peso < 0.3 ? 0.3 : $total_peso;
         $data[$keys]['nCdFormato'] = '1';
@@ -110,30 +118,36 @@ class Correios extends AbstractCarrier implements CarrierInterface {
           $request->getPackageValue(),
           $request->getPackageCurrency()
         );
+
+        $response = $this->requestCorreios('http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?StrRetorno=xml&' . http_build_query($data[$keys]));
+
+        $dom = new \DOMDocument('1.0', 'ISO-8859-1');
+        $dom->loadXml($response);
+
+        if ($dom->getElementsByTagName('MsgErro')->item(0)->nodeValue !== "") {
+          throw new \Exception($dom->getElementsByTagName('MsgErro')->item(0)->nodeValue, 1);
+        }
+
+        $valor = $dom->getElementsByTagName('Valor')->item(0)->nodeValue;
+        $prazo = $dom->getElementsByTagName('PrazoEntrega')->item(0)->nodeValue;
+
+        /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
+        $method = $this->rateMethodFactory->create();
+
+        $method->setCarrier($this->_code);
+        $method->setCarrierTitle($this->getConfigData('title'));
+
+        $method->setMethod($this->_code);
+        $method->setMethodTitle("Em média $prazo dia(s)");
+
+        $shippingCost = (float)$valor;
+
+        $method->setPrice($shippingCost);
+        $method->setCost($shippingCost);
+
+        $result->append($method);
       }
-
-
-
-      print_r($data);
-
-      /** @var \Magento\Shipping\Model\Rate\Result $result */
-      $result = $this->rateResultFactory->create();
-
-      /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
-      $method = $this->rateMethodFactory->create();
-
-      $method->setCarrier($this->_code);
-      $method->setCarrierTitle($this->getConfigData('title'));
-
-      $method->setMethod($this->_code);
-      $method->setMethodTitle($this->getConfigData('name'));
-
-      $shippingCost = (float)500;
-
-      $method->setPrice($shippingCost);
-      $method->setCost($shippingCost);
-
-      $result->append($method);
+      
     } catch (\Exception $e) {
       $result = $this->_rateErrorFactory->create();
       $result->setCarrier($this->_code)
@@ -152,5 +166,26 @@ class Correios extends AbstractCarrier implements CarrierInterface {
    */
   public function getAllowedMethods() {
     return [$this->_code => $this->getConfigData('name')];
+  }
+
+  public function requestCorreios($url) {
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+      CURLOPT_URL => $url,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_ENCODING => "",
+      CURLOPT_MAXREDIRS => 10,
+      CURLOPT_TIMEOUT => 0,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+      CURLOPT_CUSTOMREQUEST => "GET",
+    ));
+
+    $content = curl_exec($curl);
+
+    curl_close($curl);
+
+    return $content;
   }
 }
