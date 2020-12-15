@@ -50,6 +50,10 @@ class Data extends AbstractHelper {
     return $this->scopeConfig->getValue($path, $storeScope);
   }
 
+  public function getOriginCep(){
+    return $this->getConfig('shipping/origin/postcode');
+  }
+
   /**
    * @param $message
    */
@@ -73,14 +77,14 @@ class Data extends AbstractHelper {
     return $new;
   }
 
-  public function validateProduct($_product) {
+  public function validateProduct( $_product) {
     $rightHeight = [1, 100];
     $rightWidth = [10, 100];
     $rightLength = [15, 100];
 
-    $height = $_product->getData()['altura_correios'];
-    $width = $_product->getData()['largura_correios'];
-    $length = $_product->getData()['comprimento_correios'];
+    $height = $_product['height'];
+    $width = $_product['width'];
+    $length = $_product['length'];
 
     if (!$length || !$width || !$height) {
       throw new \Exception("Dimensões de um ou mais produtos não preenchidas!", 1);

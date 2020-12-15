@@ -53,7 +53,7 @@ class AddComprimentoCorreiosProductAttribute implements DataPatchInterface, Patc
       [
         'group' => 'Correios',
         'type' => 'varchar',
-        'label' => 'Comprimento Correios',
+        'label' => 'Comprimento Correios (cm)',
         'input' => 'text',
         'source' => '',
         'frontend' => '',

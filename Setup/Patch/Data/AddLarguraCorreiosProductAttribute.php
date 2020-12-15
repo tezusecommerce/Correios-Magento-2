@@ -53,7 +53,7 @@ class AddLarguraCorreiosProductAttribute implements DataPatchInterface, PatchRev
       [
         'group' => 'Correios',
         'type' => 'varchar',
-        'label' => 'Largura Correios',
+        'label' => 'Largura Correios (cm)',
         'input' => 'text',
         'source' => '',
         'frontend' => '',

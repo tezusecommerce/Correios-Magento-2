@@ -9,13 +9,13 @@ namespace Tezus\Correios\Model\Config\Source;
 
 class ShipmentType {
 
-  const SEDEXSC = 40010;
+  const SEDEXSC = 4014;
   const SEDEXCC = 40096;
   const ESEDEXCC = 84019;
-  const PACSC = 41106;
+  const PACSC = 4510;
   const PACCC = 41068;
-  const SEDEX10 = 40215;
-  const SEDEXHJ = 40290;
+  const SEDEX10 = 4790;
+  const SEDEXHJ = 4804;
   const SEDEXAC = 40045;
 
   public function toOptionArray() {

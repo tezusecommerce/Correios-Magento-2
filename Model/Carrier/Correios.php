@@ -45,12 +45,16 @@ class Correios extends AbstractCarrier implements CarrierInterface {
     \Psr\Log\LoggerInterface $logger,
     \Magento\Shipping\Model\Rate\ResultFactory $rateResultFactory,
     \Magento\Quote\Model\Quote\Address\RateResult\MethodFactory $rateMethodFactory,
+    \Magento\Catalog\Model\ProductRepository $productRepository,
+    \Tezus\Correios\Helper\Data $helper,
     array $data = []
   ) {
     parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
 
     $this->rateResultFactory = $rateResultFactory;
     $this->rateMethodFactory = $rateMethodFactory;
+    $this->productRepository = $productRepository;
+    $this->helperData = $helper;
   }
 
   /**
@@ -65,25 +69,52 @@ class Correios extends AbstractCarrier implements CarrierInterface {
     }
 
     try {
+      $methods = explode(",", $this->getConfigData('shipment_type'));
+      foreach ($methods as $keys => $send) {
+        if ($request->getAllItems()) {
+          $data['cubic'] = 0;
+          $total_peso = 0;
+          $total_cm_cubico = 0;
 
-      if ($request->getAllItems()) {
-        $data['cubic'] = 0;
-        //$attributes = $this->helperData->getAttributes();
-        foreach ($request->getAllItems() as $key => $item) {
-          $product = $this->productRepository->getById($item->getProductId());
-          if ($this->helperData->validateProduct($product)) {
-            $data['cubic'] +=  $product->getData()['altura_correios'] * $product->getData()['largura_correios'] * $product->getData()['comprimento_correios'] * 300 / 1000000 * $item->getQty();
+          //$attributes = $this->helperData->getAttributes();
+          foreach ($request->getAllItems() as $key => $item) {
+            $product = $this->productRepository->getById($item->getProductId());
+            $productData['height'] = $product->getData()['magecommerce_height'];
+            $productData['width'] = $product->getData()['magecommerce_width'];
+            $productData['length'] = $product->getData()['magecommerce_length'];
+
+            if ($this->helperData->validateProduct($productData)) {
+              $data['cubic'] +=  $productData['height'] * $productData['width'] * $productData['length'] * 300 / 1000000 * $item->getQty();
+              $row_peso = $request->getPackageWeight() * $item->getQty();
+              $row_cm = ($productData['height'] * $productData['width'] * $productData['length']) * $item->getQty();
+
+              $total_peso += $row_peso;
+              $total_cm_cubico += $row_cm;
+            }
           }
+          $raiz_cubica = round(pow($total_cm_cubico, 1 / 3), 2);
         }
+        $data[$keys]['nCdEmpresa'] = $this->getConfigFlag('contract_number');
+        $data[$keys]['sDsSenha'] = $this->getConfigFlag('contrac_password');
+        $data[$keys]['nCdServico'] = $send;
+        $data[$keys]['nVlPeso'] = $total_peso < 0.3 ? 0.3 : $total_peso;
+        $data[$keys]['nCdFormato'] = '1';
+        $data[$keys]['nVlComprimento'] = $raiz_cubica < 16 ? 16 : $raiz_cubica;
+        $data[$keys]['nVlAltura'] = $raiz_cubica < 2 ? 2 : $raiz_cubica;
+        $data[$keys]['nVlLargura'] = $raiz_cubica < 11 ? 11 : $raiz_cubica;
+        $data[$keys]['nVlDiametro'] = hypot($data[$keys]['nVlComprimento'], $data[$keys]['nVlLargura']);
+        $data[$keys]['sCdMaoPropria'] = $this->getConfigData('own_hands');
+        $data[$keys]['sCepDestino'] = $request->getDestPostcode();
+        $data[$keys]['sCepOrigem'] = $this->helperData->getOriginCep();
+        $data[$keys]['nVlValorDeclarado'] = $request->getBaseCurrency()->convert(
+          $request->getPackageValue(),
+          $request->getPackageCurrency()
+        );
       }
 
-      $data['packageWeight'] = $request->getPackageWeight();
-      $data['postDest'] = $request->getDestPostcode();
-      $data['postOrigin'] = $request->getOrigPostcode();
-      $data['packageValue'] = $request->getBaseCurrency()->convert(
-        $request->getPackageValue(),
-        $request->getPackageCurrency()
-      );
+
+
+      print_r($data);
 
       /** @var \Magento\Shipping\Model\Rate\Result $result */
       $result = $this->rateResultFactory->create();

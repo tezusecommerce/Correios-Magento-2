@@ -53,7 +53,7 @@ class AddAlturaCorreiosProductAttribute implements DataPatchInterface, PatchReve
       [
         'group' => 'Correios',
         'type' => 'varchar',
-        'label' => 'Altura Correios',
+        'label' => 'Altura Correios (cm)',
         'input' => 'text',
         'source' => '',
         'frontend' => '',
