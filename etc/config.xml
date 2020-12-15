@@ -11,6 +11,9 @@
         <default_length>15</default_length>
         <increment_days_in_delivery_time>0</increment_days_in_delivery_time>
         <maximum_weight>30</maximum_weight>
+        <height_attribute>altura_correios</height_attribute>
+        <length_attribute>comprimento_correios</length_attribute>
+        <width_attribute>largura_correios</width_attribute>
         <sort_order>1</sort_order>
         <model>Tezus\Correios\Model\Carrier\Correios</model>
       </correios>

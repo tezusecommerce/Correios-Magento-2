@@ -115,7 +115,28 @@
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
           <frontend_class>shipping-skip-hide</frontend_class>
         </field>
-        <field id="sort_order" translate="label" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="0">
+        <field id="height_attribute" translate="label" type="select" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="0">
+          <label>Altura</label>
+          <source_model>Tezus\Correios\Model\Config\Source\Attributes</source_model>
+          <depends>
+            <field id="carriers/tnt/active">1</field>
+          </depends>
+        </field>
+        <field id="length_attribute" translate="label" type="select" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="0">
+          <label>Comprimento</label>
+          <source_model>Tezus\Correios\Model\Config\Source\Attributes</source_model>
+          <depends>
+            <field id="carriers/tnt/active">1</field>
+          </depends>
+        </field>
+        <field id="width_attribute" translate="label" type="select" sortOrder="210" showInDefault="1" showInWebsite="1" showInStore="0">
+          <label>Largura</label>
+          <source_model>Tezus\Correios\Model\Config\Source\Attributes</source_model>
+          <depends>
+            <field id="carriers/tnt/active">1</field>
+          </depends>
+        </field>
+        <field id="sort_order" translate="label" type="text" sortOrder="220" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Sort Order</label>
           <depends>
             <field id="carriers/correios/active">1</field>

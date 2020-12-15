@@ -122,4 +122,14 @@ class Data extends AbstractHelper {
         }
     }
   }
+
+  public function getAttributes() {
+    $data = [];
+
+    $data['height'] = $this->getconfig('carriers/correios/height_attribute');
+    $data['length'] = $this->getconfig('carriers/correios/length_attribute');
+    $data['width'] = $this->getconfig('carriers/correios/width_attribute');
+
+    return $data;
+  }
 }

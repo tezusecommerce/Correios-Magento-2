@@ -78,13 +78,13 @@ class Correios extends AbstractCarrier implements CarrierInterface {
           $total_peso = 0;
           $total_cm_cubico = 0;
 
-          //$attributes = $this->helperData->getAttributes();
+          $attributes = $this->helperData->getAttributes();
           foreach ($request->getAllItems() as $key => $item) {
             $product = $this->productRepository->getById($item->getProductId());
 
-            $productData['height'] = !isset($product->getData()['magecommerce_height']) ? $this->getConfigData('default_height') : $product->getData()['magecommerce_height'];
-            $productData['width'] = !isset($product->getData()['magecommerce_width']) ? $this->getConfigData('default_width') : $product->getData()['magecommerce_width'];
-            $productData['length'] = !isset($product->getData()['magecommerce_length']) ? $this->getConfigData('default_length') : $product->getData()['magecommerce_length'];
+            $productData['height'] = !isset($product->getData()[$attributes['height']]) ? $this->getConfigData('default_height') : $product->getData()[$attributes['height']];
+            $productData['width'] = !isset($product->getData()[$attributes['width']]) ? $this->getConfigData('default_width') : $product->getData()[$attributes['width']];
+            $productData['length'] = !isset($product->getData()[$attributes['length']]) ? $this->getConfigData('default_length') : $product->getData()[$attributes['length']];
 
             if ($this->helperData->validateProduct($productData)) {
               $row_peso = $request->getPackageWeight() * $item->getQty();
