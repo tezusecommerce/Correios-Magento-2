@@ -10,7 +10,7 @@
         <default_height>1</default_height>
         <default_length>15</default_length>
         <increment_days_in_delivery_time>0</increment_days_in_delivery_time>
-        <maximum_weight>0</maximum_weight>
+        <maximum_weight>30</maximum_weight>
         <sort_order>1</sort_order>
         <model>Tezus\Correios\Model\Carrier\Correios</model>
       </correios>

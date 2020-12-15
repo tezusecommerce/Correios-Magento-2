@@ -81,7 +81,7 @@ class Correios extends AbstractCarrier implements CarrierInterface {
           //$attributes = $this->helperData->getAttributes();
           foreach ($request->getAllItems() as $key => $item) {
             $product = $this->productRepository->getById($item->getProductId());
-            
+
             $productData['height'] = !$product->getData()['magecommerce_height'] ? $this->getConfigData('default_height') : $product->getData()['magecommerce_height'];
             $productData['width'] = !$product->getData()['magecommerce_width'] ? $this->getConfigData('default_width') : $product->getData()['magecommerce_width'];
             $productData['length'] = !$product->getData()['magecommerce_length'] ? $this->getConfigData('default_length') : $product->getData()['magecommerce_length'];
@@ -92,6 +92,9 @@ class Correios extends AbstractCarrier implements CarrierInterface {
 
               $total_peso += $row_peso;
               $total_cm_cubico += $row_cm;
+              if($total_peso > $this->getConfigData('maximum_weight')){
+                throw new \Exception("O Peso do produto excede o permitido para este tipo de envio.", 1);
+              }
             }
           }
           $raiz_cubica = round(pow($total_cm_cubico, 1 / 3), 2);
@@ -128,8 +131,8 @@ class Correios extends AbstractCarrier implements CarrierInterface {
           throw new \Exception($dom->getElementsByTagName('MsgErro')->item(0)->nodeValue, 1);
         }
 
-        $valor = $dom->getElementsByTagName('Valor')->item(0)->nodeValue;
-        $prazo = $dom->getElementsByTagName('PrazoEntrega')->item(0)->nodeValue;
+        $valor = $dom->getElementsByTagName('Valor')->item(0)->nodeValue + $this->getConfigData('handling_fee');
+        $prazo = $dom->getElementsByTagName('PrazoEntrega')->item(0)->nodeValue + $this->getConfigData('increment_days_in_delivery_time');
 
         /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
         $method = $this->rateMethodFactory->create();
@@ -137,8 +140,15 @@ class Correios extends AbstractCarrier implements CarrierInterface {
         $method->setCarrier($this->_code);
         $method->setCarrierTitle($this->getConfigData('title'));
 
+        if($this->getConfigData('display_delivery_time')){
+          $mensagem = $this->helperData->getMethodName($send) . " - Em média $prazo dia(s)";
+        }
+        else{
+          $mensagem = $this->helperData->getMethodName($send);
+        }
+
         $method->setMethod($this->_code);
-        $method->setMethodTitle($this->helperData->getMethodName($send) . " - Em média $prazo dia(s)");
+        $method->setMethodTitle($mensagem);
 
         $shippingCost = str_replace(",", ".", $valor);
 
@@ -148,10 +158,15 @@ class Correios extends AbstractCarrier implements CarrierInterface {
         $result->append($method);
       }
     } catch (\Exception $e) {
-      $result = $this->_rateErrorFactory->create();
-      $result->setCarrier($this->_code)
-        ->setCarrierTitle($this->getConfigData('name') . " - " . $this->getConfigData('title'))
-        ->setErrorMessage(__($e->getMessage()));
+      if($this->getConfigData('showmethod')){
+        $result = $this->_rateErrorFactory->create();
+        $result->setCarrier($this->_code)
+          ->setCarrierTitle($this->getConfigData('name') . " - " . $this->getConfigData('title'))
+          ->setErrorMessage(__($e->getMessage()));
+      }
+      else{
+        return false;
+      }
     }
     return $result;
   }
