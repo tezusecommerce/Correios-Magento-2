@@ -75,19 +75,18 @@ class Correios extends AbstractCarrier implements CarrierInterface {
       $methods = explode(",", $this->getConfigData('shipment_type'));
       foreach ($methods as $keys => $send) {
         if ($request->getAllItems()) {
-          $data['cubic'] = 0;
           $total_peso = 0;
           $total_cm_cubico = 0;
 
           //$attributes = $this->helperData->getAttributes();
           foreach ($request->getAllItems() as $key => $item) {
             $product = $this->productRepository->getById($item->getProductId());
-            $productData['height'] = $product->getData()['magecommerce_height'];
-            $productData['width'] = $product->getData()['magecommerce_width'];
-            $productData['length'] = $product->getData()['magecommerce_length'];
+            
+            $productData['height'] = !$product->getData()['magecommerce_height'] ? $this->getConfigData('default_height') : $product->getData()['magecommerce_height'];
+            $productData['width'] = !$product->getData()['magecommerce_width'] ? $this->getConfigData('default_width') : $product->getData()['magecommerce_width'];
+            $productData['length'] = !$product->getData()['magecommerce_length'] ? $this->getConfigData('default_length') : $product->getData()['magecommerce_length'];
 
             if ($this->helperData->validateProduct($productData)) {
-              $data['cubic'] +=  $productData['height'] * $productData['width'] * $productData['length'] * 300 / 1000000 * $item->getQty();
               $row_peso = $request->getPackageWeight() * $item->getQty();
               $row_cm = ($productData['height'] * $productData['width'] * $productData['length']) * $item->getQty();
 
@@ -118,6 +117,7 @@ class Correios extends AbstractCarrier implements CarrierInterface {
           $request->getPackageValue(),
           $request->getPackageCurrency()
         );
+        $data[$keys]['sCdAvisoRecebimento'] = $this->getConfigData('acknowledgment_of_receipt') === true ? "S" : "N";
 
         $response = $this->requestCorreios('http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?StrRetorno=xml&' . http_build_query($data[$keys]));
 

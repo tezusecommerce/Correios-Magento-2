@@ -6,12 +6,12 @@
         <active>0</active>
         <title>Correios</title>
         <name>Correios</name>
-        <default_width>0</default_width>
-        <default_height>0</default_height>
-        <default_length>0</default_length>
+        <default_width>10</default_width>
+        <default_height>1</default_height>
+        <default_length>15</default_length>
         <increment_days_in_delivery_time>0</increment_days_in_delivery_time>
         <maximum_weight>0</maximum_weight>
-        <sort_order>15</sort_order>
+        <sort_order>1</sort_order>
         <model>Tezus\Correios\Model\Carrier\Correios</model>
       </correios>
     </carriers>

@@ -10,67 +10,117 @@
         </field>
         <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Title</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
+          <validate>required-entry</validate>
         </field>
         <field id="name" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Method Name</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
+          <validate>required-entry</validate>
         </field>
         <field id="shipment_type" translate="label" type="multiselect" sortOrder="40" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Shipment Type</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
+          <validate>required-entry</validate>
           <source_model>Tezus\Correios\Model\Config\Source\ShipmentType</source_model>
         </field>
         <field id="contract_number" translate="label" type="text" sortOrder="50" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Contract Number</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
         </field>
         <field id="contrac_password" translate="label" type="obscure" sortOrder="60" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Contract Password</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
           <comment/>
         </field>
         <field id="own_hands" translate="label" type="select" sortOrder="70" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Own Hands</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
         <field id="acknowledgment_of_receipt" translate="label" type="select" sortOrder="80" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Acknowledgment of Receipt</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
           <comment/>
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-        </field>
-        <field id="validate_dimensions" translate="label" type="select" sortOrder="90" showInDefault="1" showInStore="1" showInWebsite="1">
-          <label>Validate Dimensions</label>
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-        </field>
-        <field id="use_declare_values" translate="label" type="select" sortOrder="100" showInDefault="1" showInStore="1" showInWebsite="1">
-          <label>Use Declare Values</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
         <field id="default_width" translate="label" type="text" sortOrder="110" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Default Width</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
+          <validate>required-entry validate-number</validate>
         </field>
         <field id="default_height" translate="label" type="text" sortOrder="120" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Default Height</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
+          <validate>required-entry validate-number</validate>
         </field>
         <field id="default_length" translate="label" type="text" sortOrder="130" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Default Length</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
+          <validate>required-entry validate-number</validate>
         </field>
         <field id="handling_fee" translate="label" type="text" sortOrder="140" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Handling Fee</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
+          <validate>required-entry validate-number</validate>
         </field>
         <field id="display_delivery_time" translate="label" type="select" sortOrder="150" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Display Delivery Time?</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
         </field>
         <field id="increment_days_in_delivery_time" translate="label" type="text" sortOrder="160" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Increment days in delivery time</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
+          <validate>required-entry validate-digits</validate>
         </field>
         <field id="maximum_weight" translate="label" type="text" sortOrder="170" showInDefault="1" showInStore="1" showInWebsite="1">
           <label>Maximum Weight</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
+          <validate>required-entry validate-number</validate>
         </field>
         <field id="showmethod" translate="label" type="select" sortOrder="180" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Show Method if Not Applicable</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
           <frontend_class>shipping-skip-hide</frontend_class>
         </field>
         <field id="sort_order" translate="label" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="0">
           <label>Sort Order</label>
+          <depends>
+            <field id="carriers/correios/active">1</field>
+          </depends>
+          <validate>required-entry validate-number</validate>
         </field>
       </group>
     </section>
