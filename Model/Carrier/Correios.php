@@ -131,8 +131,8 @@ class Correios extends AbstractCarrier implements CarrierInterface {
           throw new \Exception($dom->getElementsByTagName('MsgErro')->item(0)->nodeValue, 1);
         }
 
-        $valor = $dom->getElementsByTagName('Valor')->item(0)->nodeValue + $this->getConfigData('handling_fee');
-        $prazo = $dom->getElementsByTagName('PrazoEntrega')->item(0)->nodeValue + $this->getConfigData('increment_days_in_delivery_time');
+        $valor = $dom->getElementsByTagName('Valor')->item(0)->nodeValue;
+        $prazo = (int)$dom->getElementsByTagName('PrazoEntrega')->item(0)->nodeValue + (int)$this->getConfigData('increment_days_in_delivery_time');
 
         /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
         $method = $this->rateMethodFactory->create();
@@ -150,7 +150,7 @@ class Correios extends AbstractCarrier implements CarrierInterface {
         $method->setMethod($this->_code);
         $method->setMethodTitle($mensagem);
 
-        $shippingCost = str_replace(",", ".", $valor);
+        $shippingCost = str_replace(",", ".", $valor) + (float)$this->getConfigData('handling_fee');
 
         $method->setPrice($shippingCost);
         $method->setCost($shippingCost);
@@ -182,7 +182,7 @@ class Correios extends AbstractCarrier implements CarrierInterface {
     return [$this->_code => $this->getConfigData('name')];
   }
 
-  public function requestCorreios($url) {
+  private function requestCorreios($url) {
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
