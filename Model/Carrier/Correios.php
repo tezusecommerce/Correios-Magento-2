@@ -138,16 +138,15 @@ class Correios extends AbstractCarrier implements CarrierInterface {
         $method->setCarrierTitle($this->getConfigData('title'));
 
         $method->setMethod($this->_code);
-        $method->setMethodTitle("Em média $prazo dia(s)");
+        $method->setMethodTitle($this->helperData->getMethodName($send) . " - Em média $prazo dia(s)");
 
-        $shippingCost = (float)$valor;
+        $shippingCost = str_replace(",", ".", $valor);
 
         $method->setPrice($shippingCost);
         $method->setCost($shippingCost);
 
         $result->append($method);
       }
-      
     } catch (\Exception $e) {
       $result = $this->_rateErrorFactory->create();
       $result->setCarrier($this->_code)

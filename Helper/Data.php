@@ -50,7 +50,7 @@ class Data extends AbstractHelper {
     return $this->scopeConfig->getValue($path, $storeScope);
   }
 
-  public function getOriginCep(){
+  public function getOriginCep() {
     return $this->getConfig('shipping/origin/postcode');
   }
 
@@ -77,7 +77,7 @@ class Data extends AbstractHelper {
     return $new;
   }
 
-  public function validateProduct( $_product) {
+  public function validateProduct($_product) {
     $rightHeight = [1, 100];
     $rightWidth = [10, 100];
     $rightLength = [15, 100];
@@ -103,5 +103,25 @@ class Data extends AbstractHelper {
     }
 
     return true;
+  }
+
+  public function getMethodName($method) {
+    switch ($method) {
+      case 4014: {
+          return "SEDEX";
+        }
+      case 4510: {
+          return "PAC";
+        }
+      case 4782: {
+          return "SEDEX 12";
+        }
+      case 4790: {
+          return "SEDEX 10";
+        }
+      case 4804: {
+          return "SEDEX Hoje";
+        }
+    }
   }
 }
