@@ -82,9 +82,9 @@ class Correios extends AbstractCarrier implements CarrierInterface {
           foreach ($request->getAllItems() as $key => $item) {
             $product = $this->productRepository->getById($item->getProductId());
 
-            $productData['height'] = !$product->getData()['magecommerce_height'] ? $this->getConfigData('default_height') : $product->getData()['magecommerce_height'];
-            $productData['width'] = !$product->getData()['magecommerce_width'] ? $this->getConfigData('default_width') : $product->getData()['magecommerce_width'];
-            $productData['length'] = !$product->getData()['magecommerce_length'] ? $this->getConfigData('default_length') : $product->getData()['magecommerce_length'];
+            $productData['height'] = !isset($product->getData()['magecommerce_height']) ? $this->getConfigData('default_height') : $product->getData()['magecommerce_height'];
+            $productData['width'] = !isset($product->getData()['magecommerce_width']) ? $this->getConfigData('default_width') : $product->getData()['magecommerce_width'];
+            $productData['length'] = !isset($product->getData()['magecommerce_length']) ? $this->getConfigData('default_length') : $product->getData()['magecommerce_length'];
 
             if ($this->helperData->validateProduct($productData)) {
               $row_peso = $request->getPackageWeight() * $item->getQty();
@@ -113,14 +113,14 @@ class Correios extends AbstractCarrier implements CarrierInterface {
         $data[$keys]['nVlAltura'] = $raiz_cubica < 2 ? 2 : $raiz_cubica;
         $data[$keys]['nVlLargura'] = $raiz_cubica < 11 ? 11 : $raiz_cubica;
         $data[$keys]['nVlDiametro'] = hypot($data[$keys]['nVlComprimento'], $data[$keys]['nVlLargura']);
-        $data[$keys]['sCdMaoPropria'] = $this->getConfigData('own_hands');
+        $data[$keys]['sCdMaoPropria'] = $this->getConfigData('own_hands')  === '1' ? "S" : "N";
         $data[$keys]['sCepDestino'] = $request->getDestPostcode();
         $data[$keys]['sCepOrigem'] = $this->helperData->getOriginCep();
         $data[$keys]['nVlValorDeclarado'] = $request->getBaseCurrency()->convert(
           $request->getPackageValue(),
           $request->getPackageCurrency()
         );
-        $data[$keys]['sCdAvisoRecebimento'] = $this->getConfigData('acknowledgment_of_receipt') === true ? "S" : "N";
+        $data[$keys]['sCdAvisoRecebimento'] = $this->getConfigData('acknowledgment_of_receipt') === '1' ? "S" : "N";
 
         $response = $this->requestCorreios('http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?StrRetorno=xml&' . http_build_query($data[$keys]));
 

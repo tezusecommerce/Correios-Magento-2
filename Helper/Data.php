@@ -87,19 +87,17 @@ class Data extends AbstractHelper {
     $length = $_product['length'];
 
     if (!$length || !$width || !$height) {
-      throw new \Exception("Dimensões de um ou mais produtos não preenchidas!", 1);
+      throw new \Exception("Dimensões de um ou mais produtos não foram preenchidos!", 1);
     }
 
-    if ($this->getConfig('carriers/correios/validate_dimensions')) {
-      if ($height < $rightHeight[0] || $height > $rightHeight[1]) {
-        throw new \Exception("Altura de um ou mais produtos está fora do permitido.", 1);
-      }
-      if ($width < $rightWidth[0] || $width > $rightWidth[1]) {
-        throw new \Exception("Largura de um ou mais produtos está fora do permitido.", 1);
-      }
-      if ($length < $rightLength[0] || $length > $rightLength[1]) {
-        throw new \Exception("Comprimento de um ou mais produtos está fora do permitido.", 1);
-      }
+    if ($height < $rightHeight[0] || $height > $rightHeight[1]) {
+      throw new \Exception("Altura de um ou mais produtos está fora do permitido.", 1);
+    }
+    if ($width < $rightWidth[0] || $width > $rightWidth[1]) {
+      throw new \Exception("Largura de um ou mais produtos está fora do permitido.", 1);
+    }
+    if ($length < $rightLength[0] || $length > $rightLength[1]) {
+      throw new \Exception("Comprimento de um ou mais produtos está fora do permitido.", 1);
     }
 
     return true;
