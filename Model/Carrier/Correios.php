@@ -19,7 +19,7 @@ class Correios extends AbstractCarrier implements CarrierInterface {
   /**
    * @var bool
    */
-  protected $_isFixed = true;
+  protected $_isFixed = false;
 
   /**
    * @var \Magento\Shipping\Model\Rate\ResultFactory
@@ -133,7 +133,7 @@ class Correios extends AbstractCarrier implements CarrierInterface {
 
         $valor = $dom->getElementsByTagName('Valor')->item(0)->nodeValue;
         $prazo = (int)$dom->getElementsByTagName('PrazoEntrega')->item(0)->nodeValue + (int)$this->getConfigData('increment_days_in_delivery_time');
-
+        $codigo = $dom->getElementsByTagName('Codigo')->item(0)->nodeValue;
         /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
         $method = $this->rateMethodFactory->create();
 
@@ -147,7 +147,7 @@ class Correios extends AbstractCarrier implements CarrierInterface {
           $mensagem = $this->helperData->getMethodName($send);
         }
 
-        $method->setMethod($this->_code);
+        $method->setMethod($codigo);
         $method->setMethodTitle($mensagem);
 
         $shippingCost = str_replace(",", ".", $valor) + (float)$this->getConfigData('handling_fee');
