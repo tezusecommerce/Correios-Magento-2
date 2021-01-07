@@ -27,7 +27,7 @@ Módulo para o cálculo de frete e prazo dos correios para lojas em Magento 2.
     - public repository `packagist.org`
     - public github repository as vcs
  - Add the composer repository to the configuration by running `composer config repositories.repo.magento.com composer https://repo.magento.com/`
- - Install the module composer by running `composer require tezus/module-correios`
+ - Install the module composer by running `composer require tezus/correios`
  - enable the module by running `php bin/magento module:enable Tezus_Correios`
  - apply database updates by running `php bin/magento setup:upgrade`\*
  - Flush the cache by running `php bin/magento cache:flush`
