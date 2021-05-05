@@ -132,6 +132,11 @@ class Correios extends AbstractCarrier implements CarrierInterface {
         }
 
         $valor = $dom->getElementsByTagName('Valor')->item(0)->nodeValue;
+        
+        if ($request->getFreeShipping()) {
+          $valor = 0.00;
+        }
+        
         $prazo = (int)$dom->getElementsByTagName('PrazoEntrega')->item(0)->nodeValue + (int)$this->getConfigData('increment_days_in_delivery_time');
         $codigo = $dom->getElementsByTagName('Codigo')->item(0)->nodeValue;
         /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
