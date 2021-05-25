@@ -96,9 +96,6 @@ class Data extends AbstractHelper {
     if ($width < $rightWidth[0] || $width > $rightWidth[1]) {
       throw new \Exception("Largura de um ou mais produtos está fora do permitido.", 1);
     }
-    if ($length < $rightLength[0] || $length > $rightLength[1]) {
-      throw new \Exception("Comprimento de um ou mais produtos está fora do permitido.", 1);
-    }
 
     return true;
   }

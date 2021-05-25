@@ -86,15 +86,13 @@ class Correios extends AbstractCarrier implements CarrierInterface {
             $productData['width'] = !isset($product->getData()[$attributes['width']]) ? $this->getConfigData('default_width') : $product->getData()[$attributes['width']];
             $productData['length'] = !isset($product->getData()[$attributes['length']]) ? $this->getConfigData('default_length') : $product->getData()[$attributes['length']];
 
-            if ($this->helperData->validateProduct($productData)) {
-              $row_peso = $request->getPackageWeight() * $item->getQty();
-              $row_cm = ($productData['height'] * $productData['width'] * $productData['length']) * $item->getQty();
+            $row_peso = $request->getPackageWeight() * $item->getQty();
+            $row_cm = (str_replace(",", ".", $productData['height']) * str_replace(",", ".", $productData['width']) * str_replace(",", ".", $productData['length'])) * $item->getQty();
 
-              $total_peso += $row_peso;
-              $total_cm_cubico += $row_cm;
-              if($total_peso > $this->getConfigData('maximum_weight')){
-                throw new \Exception("O Peso do produto excede o permitido para este tipo de envio.", 1);
-              }
+            $total_peso += $row_peso;
+            $total_cm_cubico += $row_cm;
+            if ($total_peso > $this->getConfigData('maximum_weight')) {
+              throw new \Exception("O Peso do produto excede o permitido para este tipo de envio.", 1);
             }
           }
           $raiz_cubica = round(pow($total_cm_cubico, 1 / 3), 2);
@@ -145,10 +143,9 @@ class Correios extends AbstractCarrier implements CarrierInterface {
         $method->setCarrier($this->_code);
         $method->setCarrierTitle($this->getConfigData('title'));
 
-        if($this->getConfigData('display_delivery_time')){
+        if ($this->getConfigData('display_delivery_time')) {
           $mensagem = $this->helperData->getMethodName($send) . " - Em média $prazo dia(s)";
-        }
-        else{
+        } else {
           $mensagem = $this->helperData->getMethodName($send);
         }
 
@@ -163,13 +160,12 @@ class Correios extends AbstractCarrier implements CarrierInterface {
         $result->append($method);
       }
     } catch (\Exception $e) {
-      if($this->getConfigData('showmethod')){
+      if ($this->getConfigData('showmethod')) {
         $result = $this->_rateErrorFactory->create();
         $result->setCarrier($this->_code)
           ->setCarrierTitle($this->getConfigData('name') . " - " . $this->getConfigData('title'))
           ->setErrorMessage(__($e->getMessage()));
-      }
-      else{
+      } else {
         return false;
       }
     }
