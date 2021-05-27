@@ -107,31 +107,31 @@ class Correios extends AbstractCarrier implements CarrierInterface
           $data[$keys]['sDsSenha'] = $this->getConfigFlag('contrac_password');
         }
 
-        $valorFinal = 0;
-        $pedido = [];
+        $finalPrice = 0;
+        $order = [];
 
         $limiteCorreios = $this->getConfigData('maximum_weight');
-        $qntPedidos = intval(ceil($total_peso / $limiteCorreios)); 
+        $qtyOrders = intval(ceil($total_peso / $limiteCorreios)); 
         
         if($total_peso > $limiteCorreios){
-          $pedidosInteiros = intval(floor($total_peso / $limiteCorreios));
+          $intOrders = intval(floor($total_peso / $limiteCorreios));
 
-          for($i = 0; $i < $qntPedidos; $i++){
-            if ( $i < $pedidosInteiros){
-              $pedido[$i] = $limiteCorreios;
+          for($i = 0; $i < $qtyOrders; $i++){
+            if ( $i < $intOrders){
+              $order[$i] = $limiteCorreios;
             } else {
-              $pedido[$i] = $total_peso % $limiteCorreios;
+              $order[$i] = $total_peso % $limiteCorreios;
             }
           }
         }
         else{
-          $pedido[0] = $total_peso;
+          $order[0] = $total_peso;
         }
 
-        for ($i = 0; $i < sizeof($pedido); $i++) {
+        for ($i = 0; $i < sizeof($order); $i++) {
 
           $data[$keys]['nCdServico'] = $send;
-          $data[$keys]['nVlPeso'] = $pedido[$i] < 0.3 ? 0.3 : $pedido[$i];
+          $data[$keys]['nVlPeso'] = $order[$i] < 0.3 ? 0.3 : $order[$i];
           $data[$keys]['nCdFormato'] = '1';
           $data[$keys]['nVlComprimento'] = $raiz_cubica < 16 ? 16 : $raiz_cubica;
           $data[$keys]['nVlAltura'] = $raiz_cubica < 2 ? 2 : $raiz_cubica;
@@ -154,13 +154,13 @@ class Correios extends AbstractCarrier implements CarrierInterface
           if ($dom->getElementsByTagName('MsgErro')->item(0)->nodeValue !== "") {
             throw new \Exception($dom->getElementsByTagName('MsgErro')->item(0)->nodeValue, 1);
           }
-          $valor[$i]= $dom->getElementsByTagName('Valor')->item(0)->nodeValue;
+          $price[$i]= $dom->getElementsByTagName('Valor')->item(0)->nodeValue;
 
-          $valorFinal += str_replace(",", ".",$valor[$i]);      
+          $finalPrice += str_replace(",", ".",$price[$i]);      
         }
 
         if ($request->getFreeShipping()) {
-          $valorFinal = 0.00;
+          $finalPrice = 0.00;
         }
 
         $prazo = (int)$dom->getElementsByTagName('PrazoEntrega')->item(0)->nodeValue + (int)$this->getConfigData('increment_days_in_delivery_time');
@@ -180,7 +180,7 @@ class Correios extends AbstractCarrier implements CarrierInterface
         $method->setMethod($codigo);
         $method->setMethodTitle($mensagem);
 
-        $shippingCost = str_replace(",", ".", $valorFinal) + (float)$this->getConfigData('handling_fee');
+        $shippingCost = str_replace(",", ".", $finalPrice) + (float)$this->getConfigData('handling_fee');
 
         $method->setPrice($shippingCost);
         $method->setCost($shippingCost);
@@ -192,7 +192,7 @@ class Correios extends AbstractCarrier implements CarrierInterface
         $result = $this->_rateErrorFactory->create();
         $result->setCarrier($this->_code)
           ->setCarrierTitle($this->getConfigData('name') . " - " . $this->getConfigData('title'))
-          ->setErrorMessage(__($e->getMessage()));
+          ->setErrorMessage(($e->getMessage()));
       } else {
         return false;
       }
