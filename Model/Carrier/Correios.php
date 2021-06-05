@@ -10,7 +10,8 @@ use Magento\Shipping\Model\Carrier\CarrierInterface;
 /**
  * Correios shipping model
  */
-class Correios extends AbstractCarrier implements CarrierInterface {
+class Correios extends AbstractCarrier implements CarrierInterface
+{
   /**
    * @var string
    */
@@ -63,7 +64,8 @@ class Correios extends AbstractCarrier implements CarrierInterface {
    * @param RateRequest $request
    * @return \Magento\Shipping\Model\Rate\Result|bool
    */
-  public function collectRates(RateRequest $request) {
+  public function collectRates(RateRequest $request)
+  {
     if (!$this->getConfigFlag('active')) {
       return false;
     }
@@ -87,18 +89,17 @@ class Correios extends AbstractCarrier implements CarrierInterface {
             $productData['length'] = !isset($product->getData()[$attributes['length']]) ? $this->getConfigData('default_length') : $product->getData()[$attributes['length']];
 
             if ($this->helperData->validateProduct($productData)) {
-              $row_peso = $request->getPackageWeight() * $item->getQty();
+              $row_peso = $product -> getWeight() * $item->getQty();
               $row_cm = ($productData['height'] * $productData['width'] * $productData['length']) * $item->getQty();
 
               $total_peso += $row_peso;
               $total_cm_cubico += $row_cm;
-              if($total_peso > $this->getConfigData('maximum_weight')){
-                throw new \Exception("O Peso do produto excede o permitido para este tipo de envio.", 1);
-              }
+              
             }
           }
           $raiz_cubica = round(pow($total_cm_cubico, 1 / 3), 2);
         }
+
         if ($this->getConfigFlag('contract_number')) {
           $data[$keys]['nCdEmpresa'] = $this->getConfigFlag('contract_number');
         }
@@ -106,37 +107,62 @@ class Correios extends AbstractCarrier implements CarrierInterface {
           $data[$keys]['sDsSenha'] = $this->getConfigFlag('contrac_password');
         }
 
-        $data[$keys]['nCdServico'] = $send;
-        $data[$keys]['nVlPeso'] = $total_peso < 0.3 ? 0.3 : $total_peso;
-        $data[$keys]['nCdFormato'] = '1';
-        $data[$keys]['nVlComprimento'] = $raiz_cubica < 16 ? 16 : $raiz_cubica;
-        $data[$keys]['nVlAltura'] = $raiz_cubica < 2 ? 2 : $raiz_cubica;
-        $data[$keys]['nVlLargura'] = $raiz_cubica < 11 ? 11 : $raiz_cubica;
-        $data[$keys]['nVlDiametro'] = hypot($data[$keys]['nVlComprimento'], $data[$keys]['nVlLargura']);
-        $data[$keys]['sCdMaoPropria'] = $this->getConfigData('own_hands')  === '1' ? "S" : "N";
-        $data[$keys]['sCepDestino'] = $request->getDestPostcode();
-        $data[$keys]['sCepOrigem'] = $this->helperData->getOriginCep();
-        $data[$keys]['nVlValorDeclarado'] = $request->getBaseCurrency()->convert(
-          $request->getPackageValue(),
-          $request->getPackageCurrency()
-        );
-        $data[$keys]['sCdAvisoRecebimento'] = $this->getConfigData('acknowledgment_of_receipt') === '1' ? "S" : "N";
+        $finalPrice = 0;
+        $order = [];
 
-        $response = $this->requestCorreios('http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?StrRetorno=xml&' . http_build_query($data[$keys]));
+        $limiteCorreios = $this->getConfigData('maximum_weight');
+        $qtyOrders = intval(ceil($total_peso / $limiteCorreios)); 
+        
+        if($total_peso > $limiteCorreios){
+          $intOrders = intval(floor($total_peso / $limiteCorreios));
 
-        $dom = new \DOMDocument('1.0', 'ISO-8859-1');
-        $dom->loadXml($response);
-
-        if ($dom->getElementsByTagName('MsgErro')->item(0)->nodeValue !== "") {
-          throw new \Exception($dom->getElementsByTagName('MsgErro')->item(0)->nodeValue, 1);
+          for($i = 0; $i < $qtyOrders; $i++){
+            if ( $i < $intOrders){
+              $order[$i] = $limiteCorreios;
+            } else {
+              $order[$i] = $total_peso % $limiteCorreios;
+            }
+          }
+        }
+        else{
+          $order[0] = $total_peso;
         }
 
-        $valor = $dom->getElementsByTagName('Valor')->item(0)->nodeValue;
-        
+        for ($i = 0; $i < sizeof($order); $i++) {
+
+          $data[$keys]['nCdServico'] = $send;
+          $data[$keys]['nVlPeso'] = $order[$i] < 0.3 ? 0.3 : $order[$i];
+          $data[$keys]['nCdFormato'] = '1';
+          $data[$keys]['nVlComprimento'] = $raiz_cubica < 16 ? 16 : $raiz_cubica;
+          $data[$keys]['nVlAltura'] = $raiz_cubica < 2 ? 2 : $raiz_cubica;
+          $data[$keys]['nVlLargura'] = $raiz_cubica < 11 ? 11 : $raiz_cubica;
+          $data[$keys]['nVlDiametro'] = hypot($data[$keys]['nVlComprimento'], $data[$keys]['nVlLargura']);
+          $data[$keys]['sCdMaoPropria'] = $this->getConfigData('own_hands')  === '1' ? "S" : "N";
+          $data[$keys]['sCepDestino'] = $request->getDestPostcode();
+          $data[$keys]['sCepOrigem'] = $this->helperData->getOriginCep();
+          $data[$keys]['nVlValorDeclarado'] = $request->getBaseCurrency()->convert(
+            $request->getPackageValue(),
+            $request->getPackageCurrency()
+          );
+          $data[$keys]['sCdAvisoRecebimento'] = $this->getConfigData('acknowledgment_of_receipt') === '1' ? "S" : "N";
+
+          $response[$i] = $this->requestCorreios('http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?StrRetorno=xml&' . http_build_query($data[$keys]));
+
+          $dom = new \DOMDocument('1.0', 'ISO-8859-1');
+          $dom->loadXml($response[$i]);
+
+          if ($dom->getElementsByTagName('MsgErro')->item(0)->nodeValue !== "") {
+            throw new \Exception($dom->getElementsByTagName('MsgErro')->item(0)->nodeValue, 1);
+          }
+          $price[$i]= $dom->getElementsByTagName('Valor')->item(0)->nodeValue;
+
+          $finalPrice += str_replace(",", ".",$price[$i]);      
+        }
+
         if ($request->getFreeShipping()) {
-          $valor = 0.00;
+          $finalPrice = 0.00;
         }
-        
+
         $prazo = (int)$dom->getElementsByTagName('PrazoEntrega')->item(0)->nodeValue + (int)$this->getConfigData('increment_days_in_delivery_time');
         $codigo = $dom->getElementsByTagName('Codigo')->item(0)->nodeValue;
         /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
@@ -145,17 +171,16 @@ class Correios extends AbstractCarrier implements CarrierInterface {
         $method->setCarrier($this->_code);
         $method->setCarrierTitle($this->getConfigData('title'));
 
-        if($this->getConfigData('display_delivery_time')){
+        if ($this->getConfigData('display_delivery_time')) {
           $mensagem = $this->helperData->getMethodName($send) . " - Em média $prazo dia(s)";
-        }
-        else{
+        } else {
           $mensagem = $this->helperData->getMethodName($send);
         }
 
         $method->setMethod($codigo);
         $method->setMethodTitle($mensagem);
 
-        $shippingCost = str_replace(",", ".", $valor) + (float)$this->getConfigData('handling_fee');
+        $shippingCost = str_replace(",", ".", $finalPrice) + (float)$this->getConfigData('handling_fee');
 
         $method->setPrice($shippingCost);
         $method->setCost($shippingCost);
@@ -163,31 +188,33 @@ class Correios extends AbstractCarrier implements CarrierInterface {
         $result->append($method);
       }
     } catch (\Exception $e) {
-      if($this->getConfigData('showmethod')){
+      if ($this->getConfigData('showmethod')) {
         $result = $this->_rateErrorFactory->create();
         $result->setCarrier($this->_code)
           ->setCarrierTitle($this->getConfigData('name') . " - " . $this->getConfigData('title'))
-          ->setErrorMessage(__($e->getMessage()));
-      }
-      else{
+          ->setErrorMessage(($e->getMessage()));
+      } else {
         return false;
       }
     }
     return $result;
   }
 
-  public function isTrackingAvailable() {
+  public function isTrackingAvailable()
+  {
     return true;
   }
 
   /**
    * @return array
    */
-  public function getAllowedMethods() {
+  public function getAllowedMethods()
+  {
     return [$this->_code => $this->getConfigData('name')];
   }
 
-  private function requestCorreios($url) {
+  private function requestCorreios($url)
+  {
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
